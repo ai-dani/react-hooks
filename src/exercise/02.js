@@ -4,15 +4,20 @@
 import * as React from 'react'
 
 function Greeting({initialName = ''}) {
-  // 🐨 initialize the state to the value from localStorage
-  // 💰 window.localStorage.getItem('name') ?? initialName
-  const [name, setName] = React.useState(initialName)
 
-  // 🐨 Here's where you'll use `React.useEffect`.
-  // The callback should set the `name` in localStorage.
-  // 💰 window.localStorage.setItem('name', name)
+  const [name, setName] = React.useState(window.localStorage.getItem('name') || initialName)
 
-  function handleChange(event) {
+  React.useEffect(() => {
+    window.localStorage.setItem('name', name)
+  }, [name])
+// ^ dependency list is needed to avoid unnecessary re-rendering
+// Hey, React, I don't care about re-renders or anything like that. 
+// All I care about is, if the name changes, then that means the side effect 
+// that I'm trying to synchronize has fallen out of sync, and I need to make 
+//an update to the state of the world to match that change in my application.
+// - Kent Dodds
+
+function handleChange(event) {
     setName(event.target.value)
   }
   return (
@@ -27,7 +32,7 @@ function Greeting({initialName = ''}) {
 }
 
 function App() {
-  return <Greeting />
+  return <Greeting initialName="Jake"/>
 }
 
 export default App
